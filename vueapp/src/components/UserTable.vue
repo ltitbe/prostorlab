@@ -32,6 +32,7 @@
                     <tr v-for="user in users" :key="user.id">
                         <td>{{ user.firstName }}</td>
                         <td>{{ user.lastName }}</td>
+                        <td><a href="javascript:;" @click="deleteUser(user.id, user.firstName, user.lastName)">Удалить</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -64,14 +65,24 @@
                 console.log(this.firstName + this.lastName)
                 await axios
                     .post('https://localhost:7112/api/users', { firstName: this.firstName, lastName: this.lastName })
-                    .then(() => {
+                    .then(async () => {
                         this.firstName = '';
                         this.lastName = ''
+                        await this.fetchData();
                     })
                     .catch(error => {
                         console.log(error)
-                    })
-                await this.fetchData();                
+                    })                                
+            },
+            deleteUser(id, firstName, lastName) {
+                if (confirm(`Вы уверены, что хотите удалить пользователя ${firstName} ${lastName}?`)) {
+                    axios
+                        .delete('https://localhost:7112/api/users/' + id)
+                        .then(async () => { await this.fetchData() })
+                        .catch(error => {
+                            console.log(error);
+                        })
+                }
             }
         },
         mounted() {
@@ -80,5 +91,33 @@
     });
 </script>
 
-<style>
+<style type="text/css" media="screen">
+    table {
+        border-collapse: collapse;
+        border: 1px solid #FF0000;
+        border-spacing: 10px;
+        margin: 10px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 150%;
+    }
+
+    table td {
+        border: 1px solid #FF0000;
+        border-spacing: 10px;
+        margin: 10px;
+    }
+
+    table th {
+        text-align: center;
+    }
+
+    input {
+        font-size: 100%;
+        margin: 10px;
+    }
+
+    button {
+        font-size: 100%;
+    }
 </style>
