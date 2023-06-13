@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace prostorlab.Models
+namespace usersapp.Models
 {
     public class SeedData
     {
@@ -15,7 +15,7 @@ namespace prostorlab.Models
                     throw new ArgumentNullException("Null ApplicationContext");
                 }
 
-                // Look for any movies.
+                // Look for any users
                 if (context.Users.Any())
                 {
                     return;   // DB has been seeded
@@ -24,16 +24,19 @@ namespace prostorlab.Models
                 context.Users.AddRange(
                     new User
                     {
+                        Id = 1,
                         FirstName = "Harry",
                         LastName = "Smith"
                     }, 
                     new User
                     {
+                        Id = 2,
                         FirstName = "John",
                         LastName = "Ivanov"
                     },
                     new User
                     {
+                        Id = 3,
                         FirstName = "Jack",
                         LastName = "Petrov"
                     }

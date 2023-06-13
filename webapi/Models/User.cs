@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace prostorlab.Models
+namespace usersapp.Models
 {
     public class User
     {

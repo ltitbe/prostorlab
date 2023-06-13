@@ -71,12 +71,11 @@
             return { users: [], componentKey: 0, edit: false}
         },
         methods: {
-            async fetchData() {
+            async getUsers() {
                 await axios
                     .get('https://localhost:7112/api/users')
                     .then((usersResponse) => {
                         this.users = usersResponse.data
-                        console.log(this.users)
                         this.componentKey += 1;
                     })
                     .catch(error => {
@@ -84,13 +83,12 @@
                     });                
             },
             async addUser() {
-                console.log(this.firstNameAdd + this.lastNameAdd)
                 await axios
                     .post('https://localhost:7112/api/users', { firstName: this.firstNameAdd, lastName: this.lastNameAdd })
                     .then(async () => {
-                        this.firstName = '';
-                        this.lastName = ''
-                        await this.fetchData();
+                        this.firstNameAdd = '';
+                        this.lastNameAdd = ''
+                        await this.getUsers();
                     })
                     .catch(error => {
                         console.log(error)
@@ -100,23 +98,26 @@
                 if (confirm(`Вы уверены, что хотите удалить пользователя ${firstName} ${lastName}?`)) {
                     await axios
                         .delete('https://localhost:7112/api/users/' + id)
-                        .then(async () => { await this.fetchData() })
+                        .then(async () => { await this.getUsers() })
                         .catch(error => {
                             console.log(error);
                         })
                 }
             },
             async editUser() {
-                console.log('userIdEdit = ' + this.userIdEdit);
-                await axios.put('https://localhost:7112/api/users/' + this.userIdEdit, { firstName: this.firstNameEdit, lastName: this.lastNameEdit })
-                .then(async () => { this.edit = false, await this.fetchData() })
-                .catch(error => {
-                    console.log(error);
-                })
+                await axios
+                    .put('https://localhost:7112/api/users/' + this.userIdEdit, { firstName: this.firstNameEdit, lastName: this.lastNameEdit })
+                    .then(async () => {
+                        this.edit = false,
+                        await this.getUsers()
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
             }            
         },
         created() {
-            this.fetchData()
+            this.getUsers()
         }
     });
 </script>

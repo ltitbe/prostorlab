@@ -1,16 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using prostorlab.Models;
-using System.Collections.Generic;
+using usersapp.Models;
 
-namespace prostorlab
+namespace usersapp
 {
     public class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public ApplicationContext()
-        {
-            Database.EnsureCreated();
-        }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
