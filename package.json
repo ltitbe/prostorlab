@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "axios": "^0.21.1",
+    "vue-editortable": "https://github.com/ltitbe/vue-editortable/tarball/master"
+  }
+}
