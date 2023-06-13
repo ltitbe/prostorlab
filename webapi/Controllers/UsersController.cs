@@ -55,10 +55,7 @@ namespace prostorlab.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            user.Id = id;
 
             _context.Entry(user).State = EntityState.Modified;
 

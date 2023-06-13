@@ -1,4 +1,4 @@
-﻿<template  :key="componentKey">
+﻿<template :key="componentKey">
     <div class="users">
         <div>
             <form @submit.prevent="addUser">
@@ -9,34 +9,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>                            
-                            <th><input v-model.trim="firstName" type="text" id="firstName" placeholder="Имя" required /></th>
-                            <th><input v-model.trim="lastName" type="text" id="lastName" placeholder="Фамилия" required /></th>
-                            <th><button type="submit">Добавить</button></th>
+                        <tr>
+                            <th>
+                                <input v-model.trim="firstNameAdd" type="text" placeholder="Имя" required />
+                                <input v-model.trim="lastNameAdd" type="text" placeholder="Фамилия" required />
+                                <button type="submit">Добавить</button>
+                            </th>
                         </tr>
                     </tbody>
                 </table>
-            </form>            
+            </form>
         </div>
+        <h2 v-if="users.length == 0">Пользователи не найдены</h2>
+        <div v-else>
+            <form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Фамилия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="user in users" :key="user.id">
+                            <tr>
+                                <td>{{ user.firstName }}</td>
+                                <td>{{ user.lastName }}</td>
+                                <td>
+                                    <button type="button" @click="edit=true; userIdEdit = user.id; firstNameEdit=user.firstName; lastNameEdit=user.lastName;">Редактировать</button>
+                                    <button type="submit" @click="deleteUser(user.id, user.firstName, user.lastName)">Удалить</button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
 
-        <h4 v-if="users.length == 0">Пользователи не найдены</h4>
-        <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Имя</th>
-                        <th>Фамилия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="user in users" :key="user.id">
-                        <td>{{ user.firstName }}</td>
-                        <td>{{ user.lastName }}</td>
-                        <td><a href="javascript:;" @click="deleteUser(user.id, user.firstName, user.lastName)">Удалить</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div v-if="edit" class="modal">
+        <div class="modal-content">
+            <form @submit.prevent="editUser">
+                <p>Редактировать пользователя</p>
+                <label>Имя:</label><input v-model.trim="firstNameEdit" type="text" placeholder="Имя" required />
+                <label>Фамилия:</label><input v-model.trim="lastNameEdit" type="text" placeholder="Фамилия" required />
+                <p>
+                    <button type="submit">Сохранить</button>
+                    <button type="button" @click="edit=false">Отменить</button>
+                </p>                
+            </form>
+        </div>        
     </div>
 </template>
 
@@ -46,7 +68,7 @@
     export default defineComponent({
         name: 'UserTable',                
         data() {            
-            return { users: [], componentKey : 0 }
+            return { users: [], componentKey: 0, edit: false}
         },
         methods: {
             async fetchData() {
@@ -62,9 +84,9 @@
                     });                
             },
             async addUser() {
-                console.log(this.firstName + this.lastName)
+                console.log(this.firstNameAdd + this.lastNameAdd)
                 await axios
-                    .post('https://localhost:7112/api/users', { firstName: this.firstName, lastName: this.lastName })
+                    .post('https://localhost:7112/api/users', { firstName: this.firstNameAdd, lastName: this.lastNameAdd })
                     .then(async () => {
                         this.firstName = '';
                         this.lastName = ''
@@ -74,50 +96,27 @@
                         console.log(error)
                     })                                
             },
-            deleteUser(id, firstName, lastName) {
+            async deleteUser(id, firstName, lastName) {
                 if (confirm(`Вы уверены, что хотите удалить пользователя ${firstName} ${lastName}?`)) {
-                    axios
+                    await axios
                         .delete('https://localhost:7112/api/users/' + id)
                         .then(async () => { await this.fetchData() })
                         .catch(error => {
                             console.log(error);
                         })
                 }
-            }
+            },
+            async editUser() {
+                console.log('userIdEdit = ' + this.userIdEdit);
+                await axios.put('https://localhost:7112/api/users/' + this.userIdEdit, { firstName: this.firstNameEdit, lastName: this.lastNameEdit })
+                .then(async () => { this.edit = false, await this.fetchData() })
+                .catch(error => {
+                    console.log(error);
+                })
+            }            
         },
-        mounted() {
+        created() {
             this.fetchData()
         }
     });
 </script>
-
-<style type="text/css" media="screen">
-    table {
-        border-collapse: collapse;
-        border: 1px solid #FF0000;
-        border-spacing: 10px;
-        margin: 10px;
-        table-layout: fixed;
-        width: 100%;
-        font-size: 150%;
-    }
-
-    table td {
-        border: 1px solid #FF0000;
-        border-spacing: 10px;
-        margin: 10px;
-    }
-
-    table th {
-        text-align: center;
-    }
-
-    input {
-        font-size: 100%;
-        margin: 10px;
-    }
-
-    button {
-        font-size: 100%;
-    }
-</style>
